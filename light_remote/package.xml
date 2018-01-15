@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package>
+  <name>light_cmd</name>
+  <version>0.0.0</version>
+  <description>
+    The light remote cmd.
+  </description>
+  <maintainer email="T3@3t-zentech.com">T3</maintainer>
+  <license>BSD</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+</package>

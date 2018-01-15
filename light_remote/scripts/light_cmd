@@ -1,0 +1,77 @@
+#!/usr/bin/env python
+
+import rospy
+from geometry_msgs.msg import Twist
+import sys, select, termios, tty
+
+msg = """
+Control Light!
+--------------
+o : open light
+p : shutdown lgiht
+
+CTRL-C to quit
+"""
+
+def getKey():
+    tty.setraw(sys.stdin.fileno())
+    rlist, _, _ = select.select([sys.stdin], [], [], 0.1)
+    if rlist:
+        key = sys.stdin.read(1)
+    else:
+        key = ''
+
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+    return key
+
+def vels(target_linear_vel, target_angular_vel):
+    return "currently:\tlight sta %s" % (target_linear_vel)
+
+if __name__=="__main__":
+    settings = termios.tcgetattr(sys.stdin)
+
+    rospy.init_node('light_cmd')
+    pub = rospy.Publisher('/light_cmd', Twist, queue_size=5)
+
+    status = 0
+    target_linear_vel = 0
+    target_angular_vel = 0
+    control_linear_vel = 0
+    control_angular_vel = 0
+    try:
+        print msg
+        while(1):
+            key = getKey()
+            if key == 'o' :
+                target_linear_vel = 1
+                status = status + 1
+                print vels(target_linear_vel,target_angular_vel)
+            elif key == 'p' :
+                target_linear_vel = 0
+                status = status + 1
+                print vels(target_linear_vel,target_angular_vel)
+            elif status == 14 :
+                print msg
+                status = 0
+            else:
+                if (key == '\x03'):
+                    break
+            control_linear_vel = target_linear_vel
+
+            twist = Twist()
+            twist.linear.x = control_linear_vel; twist.linear.y = 0; twist.linear.z = 0
+            twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = control_angular_vel
+            pub.publish(twist)
+
+    except:
+        print e
+
+    finally:
+        twist = Twist()
+        twist.linear.x = 0; twist.linear.y = 0; twist.linear.z = 0
+        twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
+        pub.publish(twist)
+
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+
+

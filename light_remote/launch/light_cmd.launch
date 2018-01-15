@@ -1,0 +1,5 @@
+<launch>
+  <!--  -->
+  <node pkg="light_cmd" type="light_cmd" name="light_cmd"  output="screen">
+  </node>
+</launch>
